@@ -2,5 +2,166 @@
 *,
 *:before,
 *:after {
-  box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+:root {
+	--primaryColor: #222233;
+	--secondaryColor: #0096b4;
+}
+
+* {
+	font-family: "Raleway";
+}
+
+#top-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	padding: 1.5rem 0;
+}
+
+.siteName {
+	display: flex;
+	align-items: center;
+}
+
+.siteName > a {
+	color: var(--primaryColor);
+	text-decoration: none;
+	font-weight: 800;
+	font-size: 30px;
+}
+
+#tools > a {
+	color: var(--primaryColor);
+	text-decoration: none;
+	font-weight: 500;
+}
+
+nav {
+	background-color: var(--primaryColor);
+	padding: 0.1rem;
+}
+
+nav > ul {
+	display: flex;
+	flex-direction: row;
+	color: white;
+	justify-content: space-around;
+	list-style-type: none;
+	padding: 0;
+	font-weight: 500;
+}
+
+nav > ul > li {
+	cursor: pointer;
+}
+
+.banner {
+	background-image: url(../images/vehicles/delorean.jpg);
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+
+.info {
+	background-color: rgba(255, 255, 255, 0.8);
+	width: 50%;
+	padding: 1rem;
+}
+
+.info > h3,
+.info > p {
+	color: var(--secondaryColor);
+}
+
+.info > h3 {
+	font-size: 21px;
+	font-weight: 700;
+	margin: 5px 0;
+}
+
+.info > p {
+	font-weight: 600;
+	margin: 5px 0;
+}
+
+.own {
+	padding: 0.5rem;
+	background-color: var(--secondaryColor);
+	color: var(--primaryColor);
+	font-size: 19px;
+	font-weight: 800;
+	border: 0;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.speci > ul > li {
+	padding: 0.1rem 0;
+}
+
+.cardsContainer {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 20px;
+}
+
+.card {
+	background-color: #00a6c7;
+	border: 1px solid #222233;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.card > a {
+	color: rgb(0, 0, 0);
+}
+
+.copyrigth {
+	font-weight: 600;
+}
+
+@media only screen and (min-width: 900px) {
+	body {
+		background-image: url(../images/site/small_check.jpg);
+	}
+
+	#wrapper {
+		margin: 3rem 6rem;
+		background-color: white;
+		padding: 1rem;
+		border: 4px solid var(--secondaryColor);
+		border-radius: 20px;
+	}
+
+	section {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		justify-items: center;
+		align-items: center;
+		grid-template-areas: "upgrades speci";
+	}
+
+	.banner {
+		background-repeat: no-repeat;
+		background-position: 50%;
+		background-size: contain;
+		height: 235px;
+	}
+
+	.info {
+		width: 30%;
+		background-color: rgba(0, 0, 0, 0.1);
+		border-radius: 20px;
+	}
+
+	.speci {
+		grid-area: speci;
+	}
+
+	.upgrades {
+		grid-area: upgrades;
+	}
 }
