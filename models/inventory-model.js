@@ -1,4 +1,4 @@
-const pool = require("../database/index");
+const pool = require("../database/pool");
 
 /* ***************************
  *  Get all classification data
