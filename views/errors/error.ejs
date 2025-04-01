@@ -1,0 +1,9 @@
+<% if (title) { %>
+  <h1><%= title %></h1>
+<% } else {
+  res.redirect('/')
+} %>
+
+<p class="error-message"><%= message %></p>
+
+<a href="/" class="btn">Return to Home</a>
