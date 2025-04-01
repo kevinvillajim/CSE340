@@ -7,10 +7,20 @@ const utilities = require("../utilities/");
 const buildByClassificationId = async function (req, res, next) {
 	const classification_id = req.params.classificationId;
 	const data = await invModel.getInventoryByClassificationId(classification_id);
+
+	// Verificar si hay datos
+	if (!data || data.length === 0) {
+		const err = new Error("No vehicles found with that classification");
+		err.status = 404;
+		return next(err);
+	}
+
 	const grid = await utilities.buildClassificationGrid(data);
 	let nav = await utilities.getNav();
 	const className = data[0].classification_name;
-	res.render("./inventory/classification", {
+
+	// Cambio de ruta: eliminando el ./ del inicio
+	res.render("inventory/classification", {
 		title: className + " vehicles",
 		nav,
 		grid,
@@ -32,7 +42,9 @@ const buildByInventoryId = async function (req, res, next) {
 	let nav = await utilities.getNav();
 	const makeName = data.inv_make;
 	const modelName = data.inv_model;
-	res.render("./inventory/detail", {
+
+	// Cambio de ruta: eliminando el ./ del inicio
+	res.render("inventory/detail", {
 		title: makeName + " " + modelName,
 		nav,
 		vehicleDetail,

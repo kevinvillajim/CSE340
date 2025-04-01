@@ -230,3 +230,65 @@ footer {
     flex: 1;
   }
 }
+
+.navItem > a {
+	text-decoration: none;
+	color: aliceblue;
+}
+
+a:visited {
+    color: inherit; /* Hereda el color del texto padre */
+    text-decoration: none; /* Opcional: elimina el subrayado */
+}
+
+/* Inventory Display Styles */
+#inv-display {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  padding: 0;
+  list-style-type: none;
+}
+
+#inv-display li {
+  border: 1px solid var(--primaryColor);
+  border-radius: 5px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#inv-display a {
+  text-decoration: none;
+  color: var(--primaryColor);
+  text-align: center;
+}
+
+#inv-display img {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+}
+
+#inv-display h2 {
+  margin: 10px 0;
+  font-size: 1.2rem;
+}
+
+#inv-display span {
+  font-weight: bold;
+  color: var(--secondaryColor);
+}
+
+@media only screen and (min-width: 600px) {
+  #inv-display {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media only screen and (min-width: 900px) {
+  #inv-display {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}

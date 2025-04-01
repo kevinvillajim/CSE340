@@ -6,9 +6,9 @@ const invModel = require("../models/inventory-model");
 async function getNav() {
 	let data = await invModel.getClassifications();
 	let list = "<ul>";
-	list += '<li><a href="/" title="Home page">Home</a></li>';
+	list += '<li class= navItem><a href="/" title="Home page">Home</a></li>';
 	data.rows.forEach((row) => {
-		list += "<li>";
+		list += "<li class= navItem>";
 		list +=
 			'<a href="/inv/type/' +
 			row.classification_id +
