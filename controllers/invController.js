@@ -8,7 +8,6 @@ const buildByClassificationId = async function (req, res, next) {
 	const classification_id = req.params.classificationId;
 	const data = await invModel.getInventoryByClassificationId(classification_id);
 
-	// Verificar si hay datos
 	if (!data || data.length === 0) {
 		const err = new Error("No vehicles found with that classification");
 		err.status = 404;
@@ -43,7 +42,6 @@ const buildByInventoryId = async function (req, res, next) {
 	const makeName = data.inv_make;
 	const modelName = data.inv_model;
 
-	// Cambio de ruta: eliminando el ./ del inicio
 	res.render("inventory/detail", {
 		title: makeName + " " + modelName,
 		nav,
