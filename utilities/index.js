@@ -169,6 +169,24 @@ const checkLogin = (req, res, next) => {
   }
 };
 
+/* ****************************************
+ *  Check Admin or Employee Access
+ * ************************************ */
+const checkAdmin = (req, res, next) => {
+  if (res.locals.loggedin) {
+    const account_type = res.locals.accountData.account_type;
+    if (account_type === "Admin" || account_type === "Employee") {
+      next();
+    } else {
+      req.flash("notice", "You don't have permission to access this area");
+      return res.redirect("/account/login");
+    }
+  } else {
+    req.flash("notice", "Please log in.");
+    return res.redirect("/account/login");
+  }
+};
+
 module.exports = {
 	getNav,
 	buildClassificationGrid,
@@ -177,4 +195,5 @@ module.exports = {
 	handleErrors,
 	checkJWTToken,
 	checkLogin,
+	checkAdmin,
 };
