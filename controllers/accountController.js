@@ -148,6 +148,7 @@ async function registerAccount(req, res) {
 /* ****************************************
  *  Process login request
  * ************************************ */
+
 async function accountLogin(req, res) {
 	let nav = await utilities.getNav();
 	const {account_email, account_password} = req.body;
