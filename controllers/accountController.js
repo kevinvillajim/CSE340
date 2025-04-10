@@ -3,6 +3,7 @@ const accountModel = require("../models/account-model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const debugLogger = require("../utilities/debug-logger");
 
 /* ****************************************
  *  Deliver login view
@@ -27,7 +28,6 @@ async function buildRegister(req, res, next) {
 		errors: null,
 	});
 }
-
 
 /* ****************************************
  *  Deliver account management view
@@ -78,12 +78,29 @@ async function registerAccount(req, res) {
 	const {account_firstname, account_lastname, account_email, account_password} =
 		req.body;
 
+	debugLogger.log(
+		"registerAccount",
+		`Registration attempt for email: ${account_email}`
+	);
+
 	// Hash the password before storing
 	let hashedPassword;
 	try {
 		// Regular password and cost (salt is generated automatically)
+		debugLogger.log("registerAccount", "Hashing password");
 		hashedPassword = await bcrypt.hash(account_password, 10);
+
+		// Debug: Log hash length and format (not the actual hash)
+		debugLogger.log(
+			"registerAccount",
+			`Hashed password length: ${hashedPassword.length}`
+		);
+		debugLogger.log(
+			"registerAccount",
+			`Hashed password format check: ${hashedPassword.substring(0, 10)}...`
+		);
 	} catch (error) {
+		debugLogger.log("registerAccount", "Error hashing password", error);
 		console.error("Error hashing password:", error);
 		req.flash(
 			"notice",
@@ -101,6 +118,7 @@ async function registerAccount(req, res) {
 	}
 
 	try {
+		debugLogger.log("registerAccount", "Calling model to store account");
 		const regResult = await accountModel.registerAccount(
 			account_firstname,
 			account_lastname,
@@ -109,6 +127,10 @@ async function registerAccount(req, res) {
 		);
 
 		if (regResult) {
+			debugLogger.log("registerAccount", "Registration successful", {
+				account_id: regResult.account_id,
+			});
+
 			req.flash(
 				"success",
 				`Congratulations, you\'re registered ${account_firstname}. Please log in.`
@@ -119,6 +141,10 @@ async function registerAccount(req, res) {
 				errors: null,
 			});
 		} else {
+			debugLogger.log(
+				"registerAccount",
+				"Registration failed at database level"
+			);
 			req.flash("notice", "Sorry, the registration failed.");
 			res.status(501).render("account/register", {
 				title: "Registration",
@@ -130,6 +156,7 @@ async function registerAccount(req, res) {
 			});
 		}
 	} catch (error) {
+		debugLogger.log("registerAccount", "Error in database operation", error);
 		console.error("Error in registerAccount:", error);
 		req.flash(
 			"notice",
@@ -146,6 +173,8 @@ async function registerAccount(req, res) {
 	}
 }
 
+
+
 /* ****************************************
  *  Process login request
  * ************************************ */
@@ -154,9 +183,12 @@ async function accountLogin(req, res) {
 	let nav = await utilities.getNav();
 	const {account_email, account_password} = req.body;
 
+	debugLogger.log("accountLogin", `Login attempt for email: ${account_email}`);
+
 	try {
-		// Verificar que los campos no estén vacíos
+		// Verify that the fields aren't empty
 		if (!account_email || !account_password) {
+			debugLogger.log("accountLogin", `Empty email or password field`);
 			req.flash("notice", "Please provide both email and password");
 			return res.status(400).render("account/login", {
 				title: "Login",
@@ -169,6 +201,10 @@ async function accountLogin(req, res) {
 		const accountData = await accountModel.getAccountByEmail(account_email);
 
 		if (!accountData) {
+			debugLogger.log(
+				"accountLogin",
+				`No account found for email: ${account_email}`
+			);
 			req.flash("notice", "Please check your credentials and try again.");
 			return res.status(400).render("account/login", {
 				title: "Login",
@@ -178,18 +214,47 @@ async function accountLogin(req, res) {
 			});
 		}
 
-		const passwordMatch = await bcrypt.compare(
-			account_password,
-			accountData.account_password
-		);
+		debugLogger.log("accountLogin", `Found account for ${account_email}`, {
+			account_id: accountData.account_id,
+			account_type: accountData.account_type,
+			password_hash_length: accountData.account_password.length,
+			// First 10 chars of hash to check format but not expose the whole hash
+			password_hash_start:
+				accountData.account_password.substring(0, 10) + "...",
+		});
+
+		debugLogger.log("accountLogin", "Attempting to compare passwords");
+
+		let passwordMatch;
+		try {
+			passwordMatch = await bcrypt.compare(
+				account_password,
+				accountData.account_password
+			);
+			debugLogger.log(
+				"accountLogin",
+				`Password comparison result: ${passwordMatch}`
+			);
+		} catch (compareError) {
+			debugLogger.log(
+				"accountLogin",
+				"Error comparing passwords",
+				compareError
+			);
+			throw compareError; // Re-throw to be caught by outer catch
+		}
 
 		if (passwordMatch) {
+			debugLogger.log("accountLogin", "Login successful, creating JWT token");
+
 			delete accountData.account_password;
 			const accessToken = jwt.sign(
 				accountData,
 				process.env.ACCESS_TOKEN_SECRET,
 				{expiresIn: 3600 * 1000}
 			);
+
+			debugLogger.log("accountLogin", "JWT token created, setting cookie");
 
 			if (process.env.NODE_ENV === "development") {
 				res.cookie("jwt", accessToken, {httpOnly: true, maxAge: 3600 * 1000});
@@ -202,9 +267,11 @@ async function accountLogin(req, res) {
 			}
 
 			req.flash("success", "You have successfully logged in");
+			debugLogger.log("accountLogin", "Redirecting to account management");
 
 			return res.redirect("/account/");
 		} else {
+			debugLogger.log("accountLogin", "Password does not match");
 			req.flash("notice", "Please check your credentials and try again.");
 			return res.status(400).render("account/login", {
 				title: "Login",
@@ -214,6 +281,7 @@ async function accountLogin(req, res) {
 			});
 		}
 	} catch (error) {
+		debugLogger.log("accountLogin", "Error during login process", error);
 		console.error("Login error:", error);
 		req.flash("notice", "An error occurred during login");
 		return res.status(500).render("account/login", {
@@ -314,8 +382,11 @@ async function updatePassword(req, res, next) {
 	// Hash the new password
 	let hashedPassword;
 	try {
-		hashedPassword = await bcrypt.hashSync(account_password, 10);
+		// FIXED: Using bcrypt.hash instead of bcrypt.hashSync with await
+		hashedPassword = await bcrypt.hash(account_password, 10);
+		console.log("Password hashed successfully, length:", hashedPassword.length);
 	} catch (error) {
+		console.error("Error hashing password:", error);
 		req.flash("error", "There was an error processing the password update.");
 		const account = await accountModel.getAccountById(account_id);
 		return res.render("account/update", {
