@@ -13,6 +13,35 @@ const static = require("./routes/static");
 const inventoryRoute = require("./routes/inventoryRoute");
 const utilities = require("./utilities/");
 const errorHandler = require("./middleware/errorHandler");
+const session = require("express-session");
+const pool = require("./db/pool");
+const bodyParser = require("body-parser");
+const expressValidator = require("express-validator");
+const flash = require("connect-flash");
+
+/* ***********************
+ * Middleware
+ *************************/
+app.use(
+	session({
+		secret: process.env.SESSION_SECRET || "your_secret_key",
+		resave: false,
+		saveUninitialized: true,
+		cookie: {secure: false}, // during development only
+	})
+);
+
+// Express Messages Middleware
+app.use(flash());
+app.use(function (req, res, next) {
+	res.locals.messages = function () {
+		return req.flash();
+	};
+	next();
+});
+
+// Body Parser Middleware
+app.use(bodyParser.urlencoded({extended: true}));
 
 /* ***********************
  * View Engine and Templates

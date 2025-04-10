@@ -99,6 +99,28 @@ function buildVehicleDetail(vehicle) {
 	return detail;
 }
 
+/* **************************************
+ * Build the classification select list
+ * ************************************ */
+async function buildClassificationList(classification_id = null) {
+	let data = await invModel.getClassifications();
+	let classificationList =
+		'<select name="classification_id" id="classificationList" required>';
+	classificationList += '<option value="">Choose a Classification</option>';
+	data.rows.forEach((row) => {
+		classificationList += '<option value="' + row.classification_id + '"';
+		if (
+			classification_id != null &&
+			row.classification_id == classification_id
+		) {
+			classificationList += " selected ";
+		}
+		classificationList += ">" + row.classification_name + "</option>";
+	});
+	classificationList += "</select>";
+	return classificationList;
+}
+
 /* ****************************************
  * Middleware For Handling Errors
  * Wrap other function in this for
@@ -114,5 +136,6 @@ module.exports = {
 	getNav,
 	buildClassificationGrid,
 	buildVehicleDetail,
+	buildClassificationList,
 	handleErrors,
 };
