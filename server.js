@@ -11,11 +11,13 @@ const env = require("dotenv").config();
 const app = express();
 const static = require("./routes/static");
 const inventoryRoute = require("./routes/inventoryRoute");
+const accountRoute = require("./routes/accountRoute");
 const utilities = require("./utilities/");
 const errorHandler = require("./middleware/errorHandler");
 const session = require("express-session");
 const pool = require("./db/pool");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const expressValidator = require("express-validator");
 const flash = require("connect-flash");
 
@@ -41,7 +43,13 @@ app.use(function (req, res, next) {
 });
 
 // Body Parser Middleware
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
+
+//Cookie Parser Middleware
+app.use(cookieParser());
+
+//JWT Checking Middleware
+app.use(utilities.checkJWTToken);
 
 /* ***********************
  * View Engine and Templates
@@ -55,6 +63,7 @@ app.set("layout", "./layouts/layout"); // not at views root
  *************************/
 app.use(static);
 app.use("/inv", inventoryRoute);
+app.use("/account", accountRoute);
 
 // Index route
 app.get(
@@ -98,4 +107,6 @@ const host = process.env.HOST;
  *************************/
 app.listen(port, () => {
 	console.log(`app listening on ${host}:${port}`);
+	console.log(require("crypto").randomBytes(64).toString("hex"));
+	console.log(require("crypto").randomBytes(64).toString("hex"));
 });

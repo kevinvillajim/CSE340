@@ -1,4 +1,6 @@
 const invModel = require("../models/inventory-model");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 /* ************************
  * Constructs the nav HTML unordered list
@@ -132,10 +134,47 @@ function handleErrors(fn) {
 	};
 }
 
+/* ****************************************
+* Middleware to check token validity
+**************************************** */
+const checkJWTToken = (req, res, next) => {
+  if (req.cookies.jwt) {
+    jwt.verify(
+      req.cookies.jwt,
+      process.env.ACCESS_TOKEN_SECRET,
+      function (err, accountData) {
+        if (err) {
+          req.flash("notice", "Please log in");
+          res.clearCookie("jwt");
+          return res.redirect("/account/login");
+        }
+        res.locals.accountData = accountData;
+        res.locals.loggedin = 1;
+        next();
+      });
+  } else {
+    next();
+  }
+};
+
+/* ****************************************
+ *  Check Login
+ * ************************************ */
+const checkLogin = (req, res, next) => {
+  if (res.locals.loggedin) {
+    next();
+  } else {
+    req.flash("notice", "Please log in.");
+    return res.redirect("/account/login");
+  }
+};
+
 module.exports = {
 	getNav,
 	buildClassificationGrid,
 	buildVehicleDetail,
 	buildClassificationList,
 	handleErrors,
+	checkJWTToken,
+	checkLogin,
 };

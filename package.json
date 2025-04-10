@@ -10,14 +10,17 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
+		"bcryptjs": "^2.4.3",
 		"body-parser": "^1.20.3",
 		"connect-flash": "^0.1.1",
+		"cookie-parser": "^1.4.7",
 		"dotenv": "^16.4.7",
 		"ejs": "^3.1.10",
 		"express": "^4.21.2",
 		"express-ejs-layouts": "^2.5.1",
 		"express-session": "^1.18.1",
 		"express-validator": "^6.15.0",
+		"jsonwebtoken": "^9.0.2",
 		"pg": "^8.14.1"
 	},
 	"devDependencies": {
