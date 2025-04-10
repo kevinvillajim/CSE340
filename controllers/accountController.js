@@ -153,18 +153,18 @@ async function accountLogin(req, res) {
 	let nav = await utilities.getNav();
 	const {account_email, account_password} = req.body;
 
-	// Verificar que se proporcionaron tanto el correo electrónico como la contraseña
-	if (!account_email || !account_password) {
-		req.flash("notice", "Please provide both email and password");
-		return res.status(400).render("account/login", {
-			title: "Login",
-			nav,
-			errors: null,
-			account_email,
-		});
-	}
-
 	try {
+		// Verificar que los campos no estén vacíos
+		if (!account_email || !account_password) {
+			req.flash("notice", "Please provide both email and password");
+			return res.status(400).render("account/login", {
+				title: "Login",
+				nav,
+				errors: null,
+				account_email,
+			});
+		}
+
 		const accountData = await accountModel.getAccountByEmail(account_email);
 
 		if (!accountData) {
@@ -181,6 +181,7 @@ async function accountLogin(req, res) {
 			account_password,
 			accountData.account_password
 		);
+
 		if (passwordMatch) {
 			delete accountData.account_password;
 			const accessToken = jwt.sign(
@@ -198,6 +199,8 @@ async function accountLogin(req, res) {
 					maxAge: 3600 * 1000,
 				});
 			}
+
+			req.flash("success", "You have successfully logged in");
 
 			return res.redirect("/account/");
 		} else {
@@ -347,9 +350,15 @@ async function updatePassword(req, res, next) {
  *  Process Logout
  * *************************************** */
 async function accountLogout(req, res, next) {
-	res.clearCookie("jwt");
-	req.flash("success", "You have been logged out");
-	return res.redirect("/");
+	try {
+		res.clearCookie("jwt");
+		req.flash("success", "You have been successfully logged out");
+		return res.redirect("/");
+	} catch (error) {
+		console.error("Logout error:", error);
+		req.flash("error", "Error during logout");
+		return res.redirect("/");
+	}
 }
 
 module.exports = {

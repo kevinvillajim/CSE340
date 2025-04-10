@@ -59,14 +59,15 @@ const loginRules = () => {
 		// valid email is required
 		body("account_email")
 			.trim()
+			.notEmpty()
+			.withMessage("Email is required.")
 			.isEmail()
-			.normalizeEmail() // refer to validator.js docs
 			.withMessage("A valid email is required."),
 
 		// password is required
 		body("account_password")
 			.trim()
-			.isLength({min: 1})
+			.notEmpty()
 			.withMessage("Password is required."),
 	];
 };
@@ -162,15 +163,15 @@ const checkRegData = async (req, res, next) => {
 const checkLoginData = async (req, res, next) => {
 	const {account_email} = req.body;
 	let errors = validationResult(req);
+
 	if (!errors.isEmpty()) {
 		let nav = await utilities.getNav();
-		res.render("account/login", {
+		return res.render("account/login", {
 			errors,
 			title: "Login",
 			nav,
 			account_email,
 		});
-		return;
 	}
 	next();
 };

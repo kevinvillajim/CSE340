@@ -26,7 +26,11 @@
       <p><a href="/inv/">Manage Inventory</a></p>
     <% } %>
     
-    <p><a href="/account/update/<%= locals.accountData.account_id %>">Update Account Information</a></p>
+    <div class="account-actions">
+      <h3>Account Information</h3>
+      <p>You can update your account information or password.</p>
+      <a href="/account/update/<%= locals.accountData.account_id %>" class="btn">Update Account Information</a>
+    </div>
   <% } else { %>
     <p>You're not logged in. <a href="/account/login">Log in here</a>.</p>
   <% } %>
