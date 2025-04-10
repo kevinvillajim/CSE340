@@ -1,5 +1,4 @@
 const pool = require("../db/pool");
-const bcrypt = require("bcryptjs");
 
 /* *****************************
  * Register new account
@@ -12,8 +11,6 @@ async function registerAccount(
 ) {
 	try {
 		// Hash the password before storing
-		const hashedPassword = await bcrypt.hashSync(account_password, 10);
-
 		const sql =
 			"INSERT INTO account (account_firstname, account_lastname, account_email, account_password, account_type) VALUES ($1, $2, $3, $4, 'Client') RETURNING *";
 
@@ -21,7 +18,7 @@ async function registerAccount(
 			account_firstname,
 			account_lastname,
 			account_email,
-			hashedPassword,
+			account_password,
 		]);
 
 		return data.rows[0];

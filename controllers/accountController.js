@@ -28,6 +28,7 @@ async function buildRegister(req, res, next) {
 	});
 }
 
+
 /* ****************************************
  *  Deliver account management view
  * *************************************** */
